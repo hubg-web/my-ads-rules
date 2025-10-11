@@ -3,6 +3,9 @@
 *.lastwarsurvival.com
 *.igamecj.com
 *.pnsdkapi.com
-*.facebook.com    # (登录时)
-*.googleapis.com  # (安卓 SDK)
-*.adjust.com      # (广告追踪)
+# (登录时)
+*.facebook.com 
+# (安卓 SDK)
+*.googleapis.com  
+# (广告追踪)
+*.adjust.com      
