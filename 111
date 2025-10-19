@@ -1,0 +1,804 @@
+cd ~/openwrt
+
+# 1) 把 samba36 相关统统关掉；启用 KSMBD
+cat >> .config <<'EOF'
+# 关闭 Samba3.6 及其 LuCI/自动脚本
+# CONFIG_PACKAGE_samba36-server is not set
+# CONFIG_PACKAGE_luci-app-samba is not set
+# CONFIG_PACKAGE_autosamba is not set
+
+# 启用 KSMBD（轻量 Samba 内核实现）
+CONFIG_PACKAGE_kmod-fs-ksmbd=y
+CONFIG_PACKAGE_ksmbd=y
+CONFIG_PACKAGE_luci-app-ksmbd=y
+CONFIG_PACKAGE_luci-i18n-ksmbd-zh-cn=y
+EOF
+
+# 2) 让配置生效
+make defconfig
+
+# 3) 清掉 samba36 的中间产物，避免残留影响
+make package/network/services/samba36/clean V=s
+
+# （可选）如果你不打算用 SFE/Shortcut-FE，加上这两行更稳（ramips 上用处不大）：
+# echo -e '# CONFIG_PACKAGE_luci-app-turboacc is not set\n# CONFIG_PACKAGE_kmod-shortcut-fe is not set' >> .config
+# make defconfig
+
+# 4) 继续编译（失败就降到串行并开详细日志）
+make -j$(nproc) || make -j1 V=s
+
+
+
+
+
+
+
+
+
+{
+  "log": {
+    "disabled": false,
+    "level": "info",
+    "output": "",
+    "timestamp": false
+  },
+  "experimental": {
+    "clash_api": {
+      "external_controller": "127.0.0.1:20123",
+      "external_ui": "",
+      "external_ui_download_url": "",
+      "external_ui_download_detour": "🎯 全球直连",
+      "secret": "458512a8f701b8a01b7a9ce36bb4169ea9a4aab29aa3e4baa3739a1464deca38",
+      "default_mode": "rule",
+      "access_control_allow_origin": [
+        "*"
+      ],
+      "access_control_allow_private_network": false
+    },
+    "cache_file": {
+      "enabled": true,
+      "path": "cache.db",
+      "cache_id": "",
+      "store_fakeip": true,
+      "store_rdrc": true,
+      "rdrc_timeout": "7d"
+    }
+  },
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "127.0.0.1",
+      "listen_port": 20122,
+      "tcp_fast_open": false,
+      "tcp_multi_path": false,
+      "udp_fragment": false
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "direct",
+      "tag": "Lastwar"
+    },
+    {
+      "type": "selector",
+      "tag": "微软服务",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🎈 自动选择"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "Apple服务",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🎈 自动选择",
+        "🎯 全球直连"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "哔哩哔哩",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🎈 自动选择",
+        "🚀 节点选择"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "TikTok",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🚀 节点选择",
+        "🎈 自动选择"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "OpenAI",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🎈 自动选择",
+        "🚀 节点选择"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "Netflix视频",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🚀 节点选择",
+        "🎈 自动选择"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "Telegram电报",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🚀 节点选择",
+        "🎈 自动选择",
+        "剩余流量：9330.01 GB",
+        "套餐到期：长期有效",
+        "🇺🇸美国高速",
+        "🇺🇸美国高速2",
+        "🇺🇸美国高速3",
+        "🇺🇸美国高速4",
+        "🇹🇼台湾Hinet",
+        "🇩🇪德国",
+        "🇫🇷法国",
+        "🇺🇸美国凤凰城",
+        "🇺🇸美国阿什本",
+        "🇦🇺悉尼高速"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "YouTube视频",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🚀 节点选择",
+        "🎈 自动选择"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "🚀 节点选择",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🎈 自动选择",
+        "剩余流量：9330.01 GB",
+        "套餐到期：长期有效",
+        "🇺🇸美国高速",
+        "🇺🇸美国高速2",
+        "🇺🇸美国高速3",
+        "🇺🇸美国高速4",
+        "🇹🇼台湾Hinet",
+        "🇩🇪德国",
+        "🇫🇷法国",
+        "🇺🇸美国凤凰城",
+        "🇺🇸美国阿什本",
+        "🇦🇺悉尼高速",
+        "dof1-hy2"
+      ]
+    },
+    {
+      "type": "urltest",
+      "tag": "🎈 自动选择",
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "3m",
+      "tolerance": 150,
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "剩余流量：9330.01 GB",
+        "套餐到期：长期有效",
+        "🇺🇸美国高速",
+        "🇺🇸美国高速2",
+        "🇺🇸美国高速3",
+        "🇺🇸美国高速4",
+        "🇹🇼台湾Hinet",
+        "🇩🇪德国",
+        "🇫🇷法国",
+        "🇺🇸美国凤凰城",
+        "🇺🇸美国阿什本",
+        "🇦🇺悉尼高速",
+        "dof1-hy2"
+      ]
+    },
+    {
+      "type": "direct",
+      "tag": "🎯 全球直连"
+    },
+    {
+      "type": "selector",
+      "tag": "🐟 漏网之鱼",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🚀 节点选择",
+        "🎯 全球直连"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "GLOBAL",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🚀 节点选择",
+        "🎈 自动选择",
+        "🎯 全球直连",
+        "🐟 漏网之鱼"
+      ]
+    },
+    {
+      "tag": "剩余流量：9330.01 GB",
+      "type": "vless",
+      "server": "69.84.182.13",
+      "server_port": 443,
+      "uuid": "28c7a296-c073-44e2-8812-5eac99da22b5",
+      "tls": {
+        "enabled": true,
+        "server_name": "us1-gs.aiopen.sbs",
+        "insecure": false,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      },
+      "transport": {
+        "type": "ws",
+        "headers": {
+          "Host": "us1-gs.aiopen.sbs"
+        },
+        "path": "/gsjc/us1"
+      }
+    },
+    {
+      "tag": "套餐到期：长期有效",
+      "type": "vless",
+      "server": "69.84.182.13",
+      "server_port": 443,
+      "uuid": "28c7a296-c073-44e2-8812-5eac99da22b5",
+      "tls": {
+        "enabled": true,
+        "server_name": "us1-gs.aiopen.sbs",
+        "insecure": false,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      },
+      "transport": {
+        "type": "ws",
+        "headers": {
+          "Host": "us1-gs.aiopen.sbs"
+        },
+        "path": "/gsjc/us1"
+      }
+    },
+    {
+      "tag": "🇺🇸美国高速",
+      "type": "vless",
+      "server": "69.84.182.13",
+      "server_port": 443,
+      "uuid": "28c7a296-c073-44e2-8812-5eac99da22b5",
+      "tls": {
+        "enabled": true,
+        "server_name": "us1-gs.aiopen.sbs",
+        "insecure": false,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      },
+      "transport": {
+        "type": "ws",
+        "headers": {
+          "Host": "us1-gs.aiopen.sbs"
+        },
+        "path": "/gsjc/us1"
+      }
+    },
+    {
+      "tag": "🇺🇸美国高速2",
+      "type": "vless",
+      "server": "208.87.242.111",
+      "server_port": 443,
+      "uuid": "28c7a296-c073-44e2-8812-5eac99da22b5",
+      "tls": {
+        "enabled": true,
+        "server_name": "tv.apple.com",
+        "insecure": false,
+        "reality": {
+          "enabled": true,
+          "public_key": "Wn_r8n28FaFq6N_B8wAAF2mrJs8TgsYzwImhuuY-wy8",
+          "short_id": "2011bd65"
+        },
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      },
+      "flow": "xtls-rprx-vision"
+    },
+    {
+      "tag": "🇺🇸美国高速3",
+      "type": "vless",
+      "server": "146.235.234.206",
+      "server_port": 443,
+      "uuid": "28c7a296-c073-44e2-8812-5eac99da22b5",
+      "tls": {
+        "enabled": true,
+        "server_name": "tv.apple.com",
+        "insecure": false,
+        "reality": {
+          "enabled": true,
+          "public_key": "Wmz2q2twfWYu6FrO5xU1M87LO5KjkyGif0AuPLNMPW0",
+          "short_id": "a86103965ac913f2"
+        },
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      },
+      "flow": "xtls-rprx-vision"
+    },
+    {
+      "tag": "🇺🇸美国高速4",
+      "type": "vless",
+      "server": "129.159.44.55",
+      "server_port": 443,
+      "uuid": "28c7a296-c073-44e2-8812-5eac99da22b5",
+      "tls": {
+        "enabled": true,
+        "server_name": "tv.apple.com",
+        "insecure": false,
+        "reality": {
+          "enabled": true,
+          "public_key": "HjlTPwNrVNR0c4stH6mWEYaKbLFjHq1WcuH3CR0cLjg",
+          "short_id": "5b32f976"
+        },
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      },
+      "flow": "xtls-rprx-vision"
+    },
+    {
+      "tag": "🇹🇼台湾Hinet",
+      "type": "vless",
+      "server": "kbgs.hinet.tw1.yydjc.top",
+      "server_port": 443,
+      "uuid": "28c7a296-c073-44e2-8812-5eac99da22b5",
+      "tls": {
+        "enabled": true,
+        "server_name": "s0.awsstatic.com",
+        "insecure": false,
+        "reality": {
+          "enabled": true,
+          "public_key": "UtL1fZqK9sl2QQaS03BQnfYBAnH760eJ_4YzSR9RniM",
+          "short_id": "601a08ef"
+        },
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      },
+      "flow": "xtls-rprx-vision"
+    },
+    {
+      "tag": "🇩🇪德国",
+      "type": "vless",
+      "server": "69.84.182.153",
+      "server_port": 443,
+      "uuid": "28c7a296-c073-44e2-8812-5eac99da22b5",
+      "tls": {
+        "enabled": true,
+        "server_name": "de1-de1-gs2.aiopen.sbs",
+        "insecure": false,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      },
+      "transport": {
+        "type": "ws",
+        "headers": {
+          "Host": "de1-de1-gs2.aiopen.sbs"
+        },
+        "path": "/gsjc/de1"
+      }
+    },
+    {
+      "tag": "🇫🇷法国",
+      "type": "vless",
+      "server": "69.84.182.13",
+      "server_port": 443,
+      "uuid": "28c7a296-c073-44e2-8812-5eac99da22b5",
+      "tls": {
+        "enabled": true,
+        "server_name": "fr-1-fr-1.aiopen.sbs",
+        "insecure": false,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      },
+      "transport": {
+        "type": "ws",
+        "headers": {
+          "Host": "fr-1-fr-1.aiopen.sbs"
+        },
+        "path": "/gsjc/fr1"
+      }
+    },
+    {
+      "tag": "🇺🇸美国凤凰城",
+      "type": "vless",
+      "server": "132.226.147.10",
+      "server_port": 443,
+      "uuid": "28c7a296-c073-44e2-8812-5eac99da22b5",
+      "tls": {
+        "enabled": true,
+        "server_name": "musicstatus.tv.apple.com",
+        "insecure": false,
+        "reality": {
+          "enabled": true,
+          "public_key": "OEZ3C-1OCSYBikqcWudtPP3PpQq2RAI7rFPxWoTCDSc",
+          "short_id": "bffe9292"
+        },
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      },
+      "flow": "xtls-rprx-vision"
+    },
+    {
+      "tag": "🇺🇸美国阿什本",
+      "type": "vless",
+      "server": "129.158.41.239",
+      "server_port": 443,
+      "uuid": "28c7a296-c073-44e2-8812-5eac99da22b5",
+      "tls": {
+        "enabled": true,
+        "server_name": "musicstatus.tv.apple.com",
+        "insecure": false,
+        "reality": {
+          "enabled": true,
+          "public_key": "Um47-P2c42os7mr1X4Hxw0290YA1FXwyG96p854qol0",
+          "short_id": "8c38a563b7a004d8"
+        },
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      },
+      "flow": "xtls-rprx-vision"
+    },
+    {
+      "tag": "🇦🇺悉尼高速",
+      "type": "vless",
+      "server": "192.9.164.54",
+      "server_port": 443,
+      "uuid": "28c7a296-c073-44e2-8812-5eac99da22b5",
+      "tls": {
+        "enabled": true,
+        "server_name": "musicstatus.tv.apple.com",
+        "insecure": false,
+        "reality": {
+          "enabled": true,
+          "public_key": "9oOtS_WWQMj6h4L72o1Lbu9ze_lmW_2PQy4diKpBjQI",
+          "short_id": "ba9c05e6cce34e2e"
+        },
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      },
+      "flow": "xtls-rprx-vision"
+    },
+    {
+      "tag": "dof1-hy2",
+      "type": "hysteria2",
+      "server": "209.38.69.67",
+      "server_port": 8443,
+      "up_mbps": 20,
+      "down_mbps": 100,
+      "password": "123456",
+      "tls": {
+        "enabled": true,
+        "server_name": "dof1.xung0910.eu.org",
+        "alpn": [
+          "h3"
+        ]
+      }
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "action": "route",
+        "domain_suffix": "lastwar.com",
+        "outbound": "Lastwar"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "Ⓜ️ 微软服务"
+        ],
+        "outbound": "微软服务"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "📺️ Netflix视频"
+        ],
+        "outbound": "Netflix视频"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "🍎 Apple服务"
+        ],
+        "outbound": "Apple服务"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "📺️ Netflix视频"
+        ],
+        "outbound": "Netflix视频"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "🅾️ OpenAI"
+        ],
+        "outbound": "OpenAI"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "📽️ TikTok"
+        ],
+        "outbound": "TikTok"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "🎬️ 哔哩哔哩"
+        ],
+        "outbound": "哔哩哔哩"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "🛩️ Telegram电报"
+        ],
+        "outbound": "Telegram电报"
+      },
+      {
+        "action": "hijack-dns",
+        "protocol": "dns"
+      },
+      {
+        "action": "route",
+        "clash_mode": "direct",
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "clash_mode": "global",
+        "outbound": "GLOBAL"
+      },
+      {
+        "action": "route",
+        "network": "icmp",
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "reject",
+        "protocol": "quic"
+      },
+      {
+        "action": "reject",
+        "rule_set": [
+          "Category-Ads"
+        ]
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoSite-Private"
+        ],
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoSite-CN"
+        ],
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoIP-Private"
+        ],
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoIP-CN"
+        ],
+        "outbound": "🎯 全球直连"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoLocation-!CN"
+        ],
+        "outbound": "🚀 节点选择"
+      }
+    ],
+    "rule_set": [
+      {
+        "tag": "🍎 Apple服务",
+        "type": "local",
+        "path": "../rulesets/ID_gg1ujmk0.srs",
+        "format": "binary"
+      },
+      {
+        "tag": "🎬️ 哔哩哔哩",
+        "type": "local",
+        "path": "../rulesets/ID_f2sbuu5o.srs",
+        "format": "binary"
+      },
+      {
+        "tag": "📽️ TikTok",
+        "type": "local",
+        "path": "../rulesets/ID_nvezb4xk.srs",
+        "format": "binary"
+      },
+      {
+        "tag": "🅾️ OpenAI",
+        "type": "local",
+        "path": "../rulesets/ID_9a56gt03.srs",
+        "format": "binary"
+      },
+      {
+        "tag": "📺️ Netflix视频",
+        "type": "local",
+        "path": "../rulesets/ID_s8zg0vfq.srs",
+        "format": "binary"
+      },
+      {
+        "tag": "🛩️ Telegram电报",
+        "type": "local",
+        "path": "../rulesets/ID_tgd6lfjd.srs",
+        "format": "binary"
+      },
+      {
+        "tag": "Ⓜ️ 微软服务",
+        "type": "local",
+        "path": "../rulesets/ID_mlqjm2z2.srs",
+        "format": "binary"
+      },
+      {
+        "tag": "Category-Ads",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      },
+      {
+        "tag": "GeoIP-Private",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/private.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      },
+      {
+        "tag": "GeoSite-Private",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      },
+      {
+        "tag": "GeoIP-CN",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      },
+      {
+        "tag": "GeoSite-CN",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      },
+      {
+        "tag": "GeoLocation-!CN",
+        "type": "remote",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-!cn.srs",
+        "format": "binary",
+        "download_detour": "🎯 全球直连"
+      }
+    ],
+    "auto_detect_interface": true,
+    "final": "🐟 漏网之鱼",
+    "default_domain_resolver": {
+      "server": "Local-DNS"
+    }
+  },
+  "dns": {
+    "servers": [
+      {
+        "tag": "Local-DNS",
+        "type": "https",
+        "domain_resolver": "Local-DNS-Resolver",
+        "server_port": 443,
+        "server": "223.5.5.5",
+        "path": "/dns-query"
+      },
+      {
+        "tag": "Local-DNS-Resolver",
+        "type": "udp",
+        "server_port": 53,
+        "server": "223.5.5.5"
+      },
+      {
+        "tag": "Remote-DNS",
+        "type": "tls",
+        "detour": "🚀 节点选择",
+        "domain_resolver": "Remote-DNS-Resolver",
+        "server_port": 853,
+        "server": "8.8.8.8"
+      },
+      {
+        "tag": "Remote-DNS-Resolver",
+        "type": "udp",
+        "detour": "🚀 节点选择",
+        "server_port": 53,
+        "server": "8.8.8.8"
+      }
+    ],
+    "rules": [
+      {
+        "action": "route",
+        "clash_mode": "direct",
+        "server": "Local-DNS"
+      },
+      {
+        "action": "route",
+        "clash_mode": "global",
+        "server": "Remote-DNS"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoSite-CN"
+        ],
+        "server": "Local-DNS"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoLocation-!CN"
+        ],
+        "server": "Remote-DNS"
+      }
+    ],
+    "disable_cache": false,
+    "disable_expire": false,
+    "independent_cache": false,
+    "final": "Remote-DNS"
+  }
+}
+
